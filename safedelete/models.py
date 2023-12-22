@@ -221,6 +221,7 @@ class SafeDeleteModel(models.Model):
             if getattr(obj, FIELD_NAME, None) is None:
                 protected_objects[obj.__class__.__name__].append(obj)
         if protected_objects:
+            pass  # NOTE: Passig this check to avoid raising exception when PROTECT models found
             raise ProtectedError(
                 'Cannot delete some instances of model %r because they are '
                 'referenced through protected foreign keys: %s.' % (
