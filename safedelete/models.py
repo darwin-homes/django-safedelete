@@ -215,21 +215,6 @@ class SafeDeleteModel(models.Model):
     def soft_delete_cascade_policy_action(self, **kwargs) -> Tuple[int, Dict[str, int]]:
         collector = NestedObjects(using=router.db_for_write(type(self)))
         collector.collect([self])
-        # Soft-delete-cascade raises an exception when trying to delete a object that related object is PROTECT
-        protected_objects = defaultdict(list)
-        for obj in collector.protected:
-            if getattr(obj, FIELD_NAME, None) is None:
-                protected_objects[obj.__class__.__name__].append(obj)
-        if protected_objects:
-            pass  # NOTE: Passig this check to avoid raising exception when PROTECT models found
-            raise ProtectedError(
-                'Cannot delete some instances of model %r because they are '
-                'referenced through protected foreign keys: %s.' % (
-                    self.__class__.__name__,
-                    ', '.join(protected_objects),
-                ),
-                set(chain.from_iterable(protected_objects.values())),
-            )
 
         # Soft-delete on related objects before
         deleted_counter: Counter = Counter()
